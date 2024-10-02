@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <form id="url-shortener-form" method="POST" action="/url/shorten">
+    <h2>Shorten Your URL</h2>
+    <input type="url" name="longUrl" placeholder="Enter your long URL" required>
+    <button type="submit">Shorten URL</button>
+  </form>
+
+  <div id="shortened-url">
+    <!-- The shortened URL will be displayed here after submission -->
+  </div>
+
+  <script>
+    document.getElementById('url-shortener-form').onsubmit = async function(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const response = await fetch('/url/shorten', {
+        method: 'POST',
+        body: JSON.stringify({
+          longUrl: formData.get('longUrl')
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+      if (result.status) {
+        document.getElementById('shortened-url').innerHTML = `
+          <p>Short URL: <a href="${result.data.shortUrl}" target="_blank">${result.data.shortUrl}</a></p>
+        `;
+      } else {
+        document.getElementById('shortened-url').innerHTML = `
+          <p>Error: ${result.message}</p>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
